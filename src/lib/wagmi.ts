@@ -1,4 +1,4 @@
-import { cookieStorage, createStorage, http } from '@wagmi/core'
+import { cookieStorage, createStorage } from '@wagmi/core'
 import { WagmiAdapter } from '@reown/appkit-adapter-wagmi'
 import { base, baseSepolia } from 'wagmi/chains'
 
@@ -9,7 +9,7 @@ if (!projectId) {
     throw new Error('Project ID is not defined')
 }
 
-export const networks = [base, baseSepolia] as any
+export const networks = [base, baseSepolia]
 
 // Set up the Wagmi Adapter (Config)
 export const wagmiAdapter = new WagmiAdapter({
@@ -18,7 +18,7 @@ export const wagmiAdapter = new WagmiAdapter({
     }),
     ssr: true,
     projectId,
-    networks: networks as any
+    networks
 })
 
 export const config = wagmiAdapter.wagmiConfig
