@@ -7,10 +7,21 @@ async function covalentFetch<T>(path: string) {
   const key = process.env.COVALENT_API_KEY;
   if (!key) throw new Error("Missing COVALENT_API_KEY");
 
-  const url = `${COVALENT_BASE_URL}/${CHAIN}${path}&key=${key}`;
+  const url = `${COVALENT_BASE_URL}/${CHAIN}${path}${
+    path.includes("?") ? "&" : "?"
+  }key=${key}`;
+  
+  console.log("FETCH URL:", url);
   const res = await fetch(url, { cache: "no-store" });
-
-  if (!res.ok) throw new Error(`Covalent error: ${res.statusText}`);
+  
+  console.log("FETCH STATUS:", res.status);
+  
+  if (!res.ok) {
+    const errorText = await res.text();
+    console.error("FETCH ERROR BODY:", errorText);
+    throw new Error(`Covalent error: ${res.status} ${res.statusText} - ${errorText}`);
+  }
+  
   const json = await res.json();
   return json as T;
 }

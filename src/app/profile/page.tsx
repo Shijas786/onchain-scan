@@ -36,10 +36,15 @@ function ProfileContent() {
   if (isLoading) return <ProfileSkeleton />;
 
   if (error || !data) {
+    console.error("SCAN ERROR:", error);
     return (
-      <p className="text-red-500">
-        Failed to load profile. Check address and try again.
-      </p>
+      <div className="text-red-500 space-y-2">
+        <p className="font-semibold">Failed to load profile.</p>
+        <p className="text-sm">Check browser console for details.</p>
+        {error instanceof Error && (
+          <p className="text-xs text-baseMuted">{error.message}</p>
+        )}
+      </div>
     );
   }
 
