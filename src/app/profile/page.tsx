@@ -1,5 +1,6 @@
 "use client";
 
+import { Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import { getOnchainProfile } from "@/lib/covalent";
@@ -12,7 +13,7 @@ import { NftGrid } from "@/components/profile/NftGrid";
 import { ActivityTimeline } from "@/components/profile/ActivityTimeline";
 import { ProfileSkeleton } from "@/components/ui/skeletons";
 
-export default function ProfilePage() {
+function ProfileContent() {
   const params = useSearchParams();
   const input = params.get("address") ?? "";
 
@@ -54,5 +55,13 @@ export default function ProfilePage() {
       <NftGrid nfts={profile.nfts} />
       <ActivityTimeline items={profile.activities} />
     </div>
+  );
+}
+
+export default function ProfilePage() {
+  return (
+    <Suspense fallback={<ProfileSkeleton />}>
+      <ProfileContent />
+    </Suspense>
   );
 }
