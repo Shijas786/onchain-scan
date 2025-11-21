@@ -24,6 +24,12 @@
     "types": [
       "node",
       "react"
+    ],
+    "incremental": true,
+    "plugins": [
+      {
+        "name": "next"
+      }
     ]
   },
   "include": [

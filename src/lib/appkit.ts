@@ -3,25 +3,28 @@
 import { createAppKit } from "@reown/appkit";
 import { WagmiAdapter } from "@reown/appkit-adapter-wagmi";
 import { base } from "viem/chains";
-import { wagmiConfig } from "./wagmi";
+import { base as baseNetwork } from "@reown/appkit/networks";
+import { http } from "@wagmi/core";
 
 const projectId = process.env.NEXT_PUBLIC_REOWN_PROJECT_ID!;
 
 const wagmiAdapter = new WagmiAdapter({
-  wagmiConfig,
-  projectId,
-  networks: [base]
+  chains: [base],
+  connectors: [],
+  transports: {
+    [base.id]: http()
+  },
+  networks: [baseNetwork],
+  projectId
 });
 
 export const appKit = createAppKit({
   adapters: [wagmiAdapter],
-  networks: [base],
+  networks: [baseNetwork],
   projectId,
   themeMode: "light",
-  defaultNetwork: base,
   features: {
-    email: true,
-    socials: true
+    email: true
   }
 });
 
