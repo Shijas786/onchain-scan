@@ -1,42 +1,76 @@
 "use client";
 
-import { motion } from "framer-motion";
-import { Trophy } from "lucide-react";
+import { OnchainProfile, ScoreBreakdown } from "@/lib/types";
+import { useWriteContract } from "wagmi";
+import { SCORE_CONTRACT_ADDRESS, scoreAbi } from "@/lib/scoreContract";
+import { shortAddress } from "@/lib/utils";
 
-interface ScoreCardProps {
-    score: number;
-    rank?: number;
-    loading?: boolean;
+type Props = {
+  profile: OnchainProfile;
+  breakdown: ScoreBreakdown;
+};
+
+export function ScoreCard({ profile, breakdown }: Props) {
+  const { writeContract, isPending } = useWriteContract();
+
+  const handlePublish = () => {
+    if (!SCORE_CONTRACT_ADDRESS) {
+      alert("Score contract address not configured.");
+      return;
+    }
+    writeContract({
+      address: SCORE_CONTRACT_ADDRESS,
+      abi: scoreAbi,
+      functionName: "updateScore",
+      args: [BigInt(breakdown.score)]
+    });
+  };
+
+  return (
+    <section className="card p-6 md:p-8 flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
+      <div>
+        <div className="text-xs uppercase tracking-wide text-baseMuted mb-1">
+          Onchain score
+        </div>
+        <div className="flex items-end gap-3">
+          <div className="text-4xl md:text-5xl font-semibold">{breakdown.score}</div>
+          <div className="text-xs text-baseMuted mb-1">
+            out of 1000
+          </div>
+        </div>
+        <div className="mt-3 text-sm text-baseMuted">
+          {shortAddress(profile.address)} · {profile.tokens.length} tokens ·{" "}
+          {profile.nfts.length} NFTs · {profile.lpPositions.length} LP positions
+        </div>
+      </div>
+      <div className="grid grid-cols-2 gap-3 text-xs md:text-sm">
+        <Breakdown label="Tokens" value={breakdown.tokensPoints} />
+        <Breakdown label="NFTs" value={breakdown.nftsPoints} />
+        <Breakdown label="LP" value={breakdown.lpPoints} />
+        <Breakdown label="Staking" value={breakdown.stakingPoints} />
+        <Breakdown label="Tx Activity" value={breakdown.txPoints} />
+        <Breakdown label="Volume" value={breakdown.volumePoints} />
+        <Breakdown label="Mints" value={breakdown.mintPoints} />
+        <Breakdown label="Contracts" value={breakdown.contractPoints} />
+        <button
+          onClick={handlePublish}
+          disabled={isPending}
+          className="col-span-2 mt-2 inline-flex justify-center rounded-2xl bg-baseBlue text-white py-2.5 text-sm font-medium shadow-card disabled:opacity-60"
+        >
+          {isPending ? "Publishing..." : "Publish score onchain"}
+        </button>
+      </div>
+    </section>
+  );
 }
 
-export function ScoreCard({ score, rank, loading }: ScoreCardProps) {
-    if (loading) {
-        return (
-            <div className="bg-white rounded-2xl p-8 shadow-lg animate-pulse h-64 flex items-center justify-center">
-                <div className="w-32 h-32 bg-gray-200 rounded-full" />
-            </div>
-        );
-    }
-
-    return (
-        <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="bg-white rounded-2xl p-8 shadow-lg relative overflow-hidden text-center"
-        >
-            <div className="absolute top-0 right-0 p-4 opacity-10">
-                <Trophy className="w-32 h-32 text-base-blue" />
-            </div>
-
-            <h3 className="text-lg font-medium text-muted-text mb-2">Onchain Score</h3>
-            <div className="text-6xl font-bold text-base-blue mb-4">{score}</div>
-
-            {rank && (
-                <div className="inline-flex items-center gap-2 px-4 py-2 bg-soft-blue rounded-full text-base-blue font-medium">
-                    <Trophy className="w-4 h-4" />
-                    Rank #{rank}
-                </div>
-            )}
-        </motion.div>
-    );
+function Breakdown({ label, value }: { label: string; value: number }) {
+  return (
+    <div className="rounded-2xl bg-baseSoftBlue/40 px-3 py-2">
+      <div className="text-[11px] uppercase tracking-wide text-baseMuted">
+        {label}
+      </div>
+      <div className="text-sm font-semibold">{value}</div>
+    </div>
+  );
 }

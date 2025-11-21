@@ -1,74 +1,35 @@
-import { TokenBalance } from "@/lib/covalent";
+import { TokenBalance } from "@/lib/types";
 
-interface TokensTableProps {
-    tokens: TokenBalance[];
-}
+export function TokensTable({ tokens }: { tokens: TokenBalance[] }) {
+  if (!tokens.length) return null;
 
-export function TokensTable({ tokens }: TokensTableProps) {
-    return (
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-            <div className="px-6 py-4 border-b border-gray-100">
-                <h3 className="font-bold text-dark-text">Top Tokens</h3>
+  return (
+    <section className="card p-5">
+      <h2 className="text-sm font-semibold mb-3">Tokens</h2>
+      <div className="space-y-2 max-h-72 overflow-auto">
+        {tokens.map((t) => (
+          <div
+            key={t.contractAddress + t.symbol}
+            className="flex items-center justify-between text-xs"
+          >
+            <div className="flex items-center gap-2">
+              <div className="h-6 w-6 rounded-full bg-baseSoftBlue" />
+              <div>
+                <div className="font-medium">{t.symbol}</div>
+                <div className="text-baseMuted text-[11px]">{t.name}</div>
+              </div>
             </div>
-            <div className="overflow-x-auto">
-                <table className="w-full">
-                    <thead className="bg-gray-50">
-                        <tr>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-muted-text uppercase tracking-wider">
-                                Asset
-                            </th>
-                            <th className="px-6 py-3 text-right text-xs font-medium text-muted-text uppercase tracking-wider">
-                                Balance
-                            </th>
-                            <th className="px-6 py-3 text-right text-xs font-medium text-muted-text uppercase tracking-wider">
-                                Value
-                            </th>
-                        </tr>
-                    </thead>
-                    <tbody className="divide-y divide-gray-100">
-                        {tokens.slice(0, 10).map((token, i) => (
-                            <tr key={i} className="hover:bg-soft-blue/20 transition-colors">
-                                <td className="px-6 py-4 whitespace-nowrap">
-                                    <div className="flex items-center">
-                                        {token.logo_url ? (
-                                            <img
-                                                src={token.logo_url}
-                                                alt={token.contract_ticker_symbol}
-                                                className="w-8 h-8 rounded-full mr-3"
-                                                onError={(e) => {
-                                                    (e.target as HTMLImageElement).src =
-                                                        "https://via.placeholder.com/32";
-                                                }}
-                                            />
-                                        ) : (
-                                            <div className="w-8 h-8 rounded-full bg-gray-200 mr-3 flex items-center justify-center text-xs font-bold text-gray-500">
-                                                {token.contract_ticker_symbol?.[0]}
-                                            </div>
-                                        )}
-                                        <div>
-                                            <div className="text-sm font-medium text-dark-text">
-                                                {token.contract_name}
-                                            </div>
-                                            <div className="text-xs text-muted-text">
-                                                {token.contract_ticker_symbol}
-                                            </div>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td className="px-6 py-4 whitespace-nowrap text-right text-sm text-dark-text">
-                                    {(
-                                        Number(token.balance) /
-                                        Math.pow(10, token.contract_decimals)
-                                    ).toLocaleString(undefined, { maximumFractionDigits: 4 })}
-                                </td>
-                                <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium text-dark-text">
-                                    ${token.pretty_quote}
-                                </td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
+            <div className="text-right">
+              <div className="font-semibold">
+                {Number(t.balance) / 10 ** t.decimals}
+              </div>
+              <div className="text-[11px] text-baseMuted">
+                {t.fiatValue ? `$${t.fiatValue.toFixed(2)}` : "-"}
+              </div>
             </div>
-        </div>
-    );
+          </div>
+        ))}
+      </div>
+    </section>
+  );
 }

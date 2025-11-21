@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { resolveEns } from "@/lib/ens";
 import { getOnchainProfile } from "@/lib/covalent";
+import { calculateScore } from "@/lib/scoring";
 
 export async function GET(req: NextRequest) {
   const addressOrEns = req.nextUrl.searchParams.get("address");
@@ -11,11 +12,13 @@ export async function GET(req: NextRequest) {
   try {
     const addr = await resolveEns(addressOrEns);
     const profile = await getOnchainProfile(addr);
-    return NextResponse.json({ profile }, { status: 200 });
+    const breakdown = calculateScore(profile);
+    return NextResponse.json({ breakdown }, { status: 200 });
   } catch (e: any) {
     return NextResponse.json(
-      { error: e?.message ?? "Failed to scan wallet" },
+      { error: e?.message ?? "Failed to calculate score" },
       { status: 500 }
     );
   }
 }
+

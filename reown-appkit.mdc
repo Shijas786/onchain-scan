@@ -1,0 +1,11 @@
+{
+  "name": "onchainscan",
+  "version": "1.0.0",
+  "description": "Base Onchain Profile Tracker Miniapp",
+  "networks": ["base"],
+  "features": {
+    "email": true,
+    "socials": true
+  },
+  "theme": "light"
+}

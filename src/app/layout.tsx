@@ -1,27 +1,25 @@
+import "../styles/globals.css";
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
-import "./globals.css";
-import ContextProvider from "@/context";
-import { headers } from "next/headers";
-
-const inter = Inter({ subsets: ["latin"] });
+import { AppProviders } from "@/context/AppProviders";
+import { Header } from "@/components/layout/Header";
 
 export const metadata: Metadata = {
   title: "Onchain Profile Tracker",
-  description: "Track and score your onchain activity on Base",
+  description: "Base Onchain Profile Tracker Miniapp"
 };
 
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
-  const cookies = headers().get("cookie");
-
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
-      <body className={inter.className}>
-        <ContextProvider cookies={cookies}>{children}</ContextProvider>
+      <body className="bg-baseBg text-baseText">
+        <AppProviders>
+          <div className="min-h-screen flex flex-col">
+            <Header />
+            <main className="flex-1 max-w-6xl mx-auto px-4 pb-12 pt-6">
+              {children}
+            </main>
+          </div>
+        </AppProviders>
       </body>
     </html>
   );
